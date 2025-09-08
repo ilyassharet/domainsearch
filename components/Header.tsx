@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { Link } from 'react-router-dom';
 import { SunIcon, MoonIcon, InfoIcon } from './icons';
 
@@ -8,30 +8,9 @@ interface HeaderProps {
   toggleTheme: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onDomainSubmit, theme, toggleTheme }) => {
+const Header = forwardRef<HTMLInputElement, HeaderProps>(({ onDomainSubmit, theme, toggleTheme }, ref) => {
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState<string>('');
-
-  // Debounce the input to trigger search automatically
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (inputValue.trim() === '') {
-        return;
-      }
-
-      const errorMessage = validateDomain(inputValue);
-      // Only auto-submit if the domain is valid. 
-      // Do not show an error while typing to avoid a disruptive UX.
-      if (!errorMessage) {
-        setError('');
-        onDomainSubmit(inputValue);
-      }
-    }, 300); // 300ms debounce delay
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [inputValue, onDomainSubmit]);
 
   const validateDomain = (domain: string): string | null => {
     const trimmedDomain = domain.trim();
@@ -112,7 +91,7 @@ const Header: React.FC<HeaderProps> = ({ onDomainSubmit, theme, toggleTheme }) =
 
         {/* Site Title: Takes natural width. Will wrap on small screens instead of truncating. */}
         <div className="px-2 text-center">
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-light-text-primary dark:text-dark-text-primary cursor-default" title="Domain Research Dashboard">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-light-text-primary dark:text-dark-text-primary">
                 Domain Research <span className="text-primary">Dashboard</span>
             </h1>
         </div>
@@ -147,11 +126,12 @@ const Header: React.FC<HeaderProps> = ({ onDomainSubmit, theme, toggleTheme }) =
         <form onSubmit={handleFormSubmit} className="max-w-xl mx-auto flex flex-col items-center">
           <div className="flex w-full">
             <input
+              ref={ref}
               type="text"
               value={inputValue}
               onChange={handleInputChange}
               placeholder="e.g., example.com"
-              className="w-full px-5 py-3 text-lg bg-light-card dark:bg-dark-card text-light-text-primary dark:text-dark-text-primary border-2 border-light-border dark:border-dark-border rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              className="w-full px-5 py-3 text-lg bg-light-card dark:bg-dark-card text-light-text-primary dark:text-dark-text-primary border-2 border-light-border dark:border-dark-border rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-input-strong tracking-wide"
               aria-invalid={!!error}
               aria-describedby="domain-error"
             />
@@ -171,6 +151,8 @@ const Header: React.FC<HeaderProps> = ({ onDomainSubmit, theme, toggleTheme }) =
       </div>
     </header>
   );
-};
+});
+
+Header.displayName = 'Header';
 
 export default Header;

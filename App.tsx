@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -21,6 +21,8 @@ const App: React.FC = () => {
   });
   
   const navigate = useNavigate();
+  const location = useLocation();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Apply theme class to HTML element and save to localStorage
   useEffect(() => {
@@ -57,6 +59,13 @@ const App: React.FC = () => {
       console.error("Failed to save favorites to localStorage", error);
     }
   }, [favorites]);
+
+  // Automatically focus the input field when on the dashboard page
+  useEffect(() => {
+    if (location.pathname === '/') {
+      inputRef.current?.focus();
+    }
+  }, [location.pathname]);
 
   const toggleTheme = () => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
@@ -104,6 +113,7 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-light-bg dark:bg-dark-bg font-sans text-light-text-primary dark:text-dark-text-primary transition-colors duration-300 flex flex-col">
       <main className="container mx-auto px-4 py-8 flex-grow">
         <Header 
+          ref={inputRef}
           onDomainSubmit={handleDomainSubmit}
           theme={theme}
           toggleTheme={toggleTheme}
