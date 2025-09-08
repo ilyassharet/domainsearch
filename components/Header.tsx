@@ -76,7 +76,11 @@ const Header = forwardRef<HTMLInputElement, HeaderProps>(({ onDomainSubmit, them
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    if (newValue === '') {
+      onDomainSubmit('');
+    }
     if (error) {
       setError('');
     }
