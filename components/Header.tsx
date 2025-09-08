@@ -81,6 +81,15 @@ const Header = forwardRef<HTMLInputElement, HeaderProps>(({ onDomainSubmit, them
       setError('');
     }
   };
+  
+  const handleClearInput = () => {
+    setInputValue('');
+    setError('');
+    onDomainSubmit('');
+    if (ref && typeof ref !== 'function' && ref.current) {
+      ref.current.focus();
+    }
+  };
 
   return (
     <header className="py-6 px-4 sm:px-6 lg:px-8">
@@ -125,16 +134,30 @@ const Header = forwardRef<HTMLInputElement, HeaderProps>(({ onDomainSubmit, them
         </p>
         <form onSubmit={handleFormSubmit} className="max-w-xl mx-auto flex flex-col items-center">
           <div className="flex w-full">
-            <input
-              ref={ref}
-              type="text"
-              value={inputValue}
-              onChange={handleInputChange}
-              placeholder="e.g., example.com"
-              className="w-full px-5 py-3 text-lg bg-light-card dark:bg-dark-card text-light-text-primary dark:text-dark-text-primary border-2 border-light-border dark:border-dark-border rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-input-strong tracking-wide"
-              aria-invalid={!!error}
-              aria-describedby="domain-error"
-            />
+            <div className="relative w-full">
+                <input
+                  ref={ref}
+                  type="text"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  placeholder="e.g., example.com"
+                  className="w-full pl-5 pr-12 py-3 text-lg bg-light-card dark:bg-dark-card text-light-text-primary dark:text-dark-text-primary border-2 border-light-border dark:border-dark-border rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-input-strong tracking-wide"
+                  aria-invalid={!!error}
+                  aria-describedby="domain-error"
+                />
+                {inputValue && (
+                  <button
+                    type="button"
+                    onClick={handleClearInput}
+                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary transition-colors focus:outline-none"
+                    aria-label="Clear input"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+            </div>
             <button
               type="submit"
               className="px-6 py-3 bg-primary text-white font-bold text-lg rounded-r-md hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-light-bg dark:focus:ring-offset-dark-bg transition-all"
