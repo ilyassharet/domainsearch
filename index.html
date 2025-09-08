@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ADB5'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1h-2v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'/%3E%3C/svg%3E" type="image/svg+xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Domain Research Dashboard</title>
+    <style>
+      :root {
+        --primary-color: #f57200; /* Light Mode: Orange */
+      }
+      .dark {
+        --primary-color: #00ADB5; /* Dark Mode: Teal */
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              // Primary color for buttons, links, and highlights using a CSS variable
+              primary: 'var(--primary-color)',
+              
+              // Light Mode Colors
+              'light-bg': '#F9FAFB', // Very light gray for background
+              'light-card': '#FFFFFF', // White for cards
+              'light-text-primary': '#111827', // Almost black for main text
+              'light-text-secondary': '#6B7280', // Medium gray for secondary text
+              'light-border': '#E5E7EB', // Light gray for borders
+
+              // Dark Mode Colors
+              'dark-bg': '#111827', // Dark gray-blue for background
+              'dark-card': '#1F2937', // Lighter gray-blue for cards
+              'dark-text-primary': '#F9FAFB', // Very light gray for main text
+              'dark-text-secondary': '#9CA3AF', // Lighter gray for secondary text
+              'dark-border': '#374151', // Medium gray for borders
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-in-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+            }
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^6.25.1"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
