@@ -51,7 +51,8 @@ const Header = forwardRef<HTMLInputElement, HeaderProps>(({ onDomainSubmit, them
         return 'The Top-Level Domain (TLD) cannot be composed entirely of numbers.';
     }
 
-    const domainRegex = new RegExp(/^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/);
+    // This regex validates the domain structure, ensuring TLDs are at least 2 chars, start with a letter, and can contain digits/hyphens.
+    const domainRegex = new RegExp(/^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z][a-zA-Z0-9-]{1,}$/);
     if (!domainRegex.test(trimmedDomain)) {
       return 'Invalid domain format. Please use a format like "example.com".';
     }
@@ -104,8 +105,8 @@ const Header = forwardRef<HTMLInputElement, HeaderProps>(({ onDomainSubmit, them
 
         {/* Site Title: Takes natural width. Will wrap on small screens instead of truncating. */}
         <div className="px-2 text-center">
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-light-text-primary dark:text-dark-text-primary">
-                Domain Research <span className="text-primary">Dashboard</span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-light-text-primary dark:text-dark-text-primary">
+                Domain Research <span className="block sm:inline text-primary">Dashboard</span>
             </h1>
         </div>
 
@@ -145,7 +146,7 @@ const Header = forwardRef<HTMLInputElement, HeaderProps>(({ onDomainSubmit, them
                   value={inputValue}
                   onChange={handleInputChange}
                   placeholder="e.g., example.com"
-                  className="w-full pl-5 pr-12 py-3 text-lg bg-light-card dark:bg-dark-card text-light-text-primary dark:text-dark-text-primary border-2 border-light-border dark:border-dark-border rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-input-strong tracking-wide"
+                  className="w-full pl-5 pr-12 py-3 text-base sm:text-lg bg-light-card dark:bg-dark-card text-light-text-primary dark:text-dark-text-primary border-2 border-light-border dark:border-dark-border rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-input-strong tracking-wide"
                   aria-invalid={!!error}
                   aria-describedby="domain-error"
                 />
@@ -156,7 +157,7 @@ const Header = forwardRef<HTMLInputElement, HeaderProps>(({ onDomainSubmit, them
                     className="absolute inset-y-0 right-0 flex items-center pr-4 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary transition-colors focus:outline-none"
                     aria-label="Clear input"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg xmlns="http://www.w.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -164,7 +165,7 @@ const Header = forwardRef<HTMLInputElement, HeaderProps>(({ onDomainSubmit, them
             </div>
             <button
               type="submit"
-              className="px-6 py-3 bg-primary text-white font-bold text-lg rounded-r-md hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-light-bg dark:focus:ring-offset-dark-bg transition-all"
+              className="px-4 sm:px-6 py-3 bg-primary text-white font-bold text-base sm:text-lg rounded-r-md hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-light-bg dark:focus:ring-offset-dark-bg transition-all"
             >
               Research
             </button>

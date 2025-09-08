@@ -6,9 +6,12 @@ interface ToolCardProps {
   domain: string;
   isFavorite: boolean;
   onToggleFavorite: (toolId: string) => void;
+  isMultiOpen?: boolean;
+  isSelected?: boolean;
+  onSelectTool?: (toolId: string) => void;
 }
 
-const ToolCard: React.FC<ToolCardProps> = ({ tool, domain, isFavorite, onToggleFavorite }) => {
+const ToolCard: React.FC<ToolCardProps> = ({ tool, domain, isFavorite, onToggleFavorite, isMultiOpen, isSelected, onSelectTool }) => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [finalUrl, setFinalUrl] = useState<string>('');
 
@@ -36,13 +39,26 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, domain, isFavorite, onToggleF
     }
   }, [tool, domain]);
   
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (status === 'error' || !finalUrl || finalUrl === '#') {
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent any action if the card is in an error state
+    if (status === 'error') {
       e.preventDefault();
       return;
     }
     
-    // Provide brief visual feedback on click without unreliable checking
+    // If in multi-open mode, toggle selection and prevent navigation.
+    if (isMultiOpen) {
+      e.preventDefault();
+      onSelectTool?.(tool.id);
+      return;
+    }
+
+    // Default behavior when not in multi-open mode
+    if (!finalUrl || finalUrl === '#') {
+      e.preventDefault();
+      return;
+    }
+    
     setStatus('loading');
     setTimeout(() => {
       setStatus('idle');
@@ -59,7 +75,7 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, domain, isFavorite, onToggleF
     switch (status) {
       case 'loading':
         return (
-          <div className="flex items-center text-sm text-light-text-secondary dark:text-dark-text-secondary">
+          <div className="flex items-center text-xs sm:text-sm text-light-text-secondary dark:text-dark-text-secondary">
             <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-light-text-secondary dark:text-dark-text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -68,37 +84,79 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, domain, isFavorite, onToggleF
           </div>
         );
       case 'error':
-        return <p className="text-sm text-red-500 dark:text-red-400">Invalid link configured.</p>;
+        return <p className="text-sm text-red-500 dark:text-red-400">This tool is misconfigured and cannot be opened.</p>;
       default:
-        return <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">{tool.description}</p>;
+        return <p className="text-xs sm:text-sm text-light-text-secondary dark:text-dark-text-secondary">{tool.description}</p>;
     }
   };
 
-  const cardClasses = `block p-6 bg-light-card dark:bg-dark-card rounded-lg shadow-lg dark:border dark:border-dark-border transform transition-all duration-300 group animate-fade-in ${
+  const cardClasses = `relative block p-4 sm:p-6 bg-light-card dark:bg-dark-card rounded-lg shadow-lg dark:border dark:border-dark-border group animate-fade-in ${
+    isSelected && status !== 'error' ? 'ring-2 ring-primary' : ''
+  } ${
     status === 'error'
-      ? 'opacity-70 cursor-not-allowed'
-      : 'hover:shadow-2xl hover:scale-105 dark:hover:bg-dark-border'
+      ? 'opacity-60 cursor-not-allowed'
+      : isMultiOpen 
+        ? 'cursor-pointer transition-none' // Card is clickable to toggle selection
+        : 'transform hover:shadow-2xl hover:scale-105 dark:hover:bg-dark-border cursor-pointer transition-shadow transition-transform duration-300'
   }`;
+
+  const handleCheckboxChange = () => {
+    if (status !== 'error') {
+      onSelectTool?.(tool.id);
+    }
+  };
+
 
   return (
     <a
       href={finalUrl}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={handleClick}
+      onClick={handleCardClick}
       className={cardClasses}
       aria-label={`Open ${tool.title} for ${domain}`}
+      // Prevent tabbing to the link if it's disabled
+      tabIndex={status === 'error' ? -1 : 0}
+      aria-disabled={status === 'error'}
     >
+      {isMultiOpen && (
+        <div className="absolute top-3 left-3 z-10" onClick={(e) => e.stopPropagation()}>
+          <label htmlFor={`select-tool-${tool.id}`} className={`relative flex items-center p-1 -m-1 ${status === 'error' ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+            <input
+              id={`select-tool-${tool.id}`}
+              type="checkbox"
+              checked={!!isSelected}
+              onChange={handleCheckboxChange}
+              disabled={status === 'error'}
+              aria-label={`Select ${tool.title}`}
+              className="sr-only"
+            />
+            <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-colors ${
+                status === 'error'
+                ? 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600'
+                : isSelected
+                    ? 'bg-primary border-primary'
+                    : 'bg-light-card dark:bg-dark-card border-light-border dark:border-dark-border'
+            }`}>
+              {isSelected && status !== 'error' && (
+                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </div>
+          </label>
+        </div>
+      )}
       <div className="flex items-start space-x-4">
-        <div className="flex-shrink-0">
+        <div className={`flex-shrink-0 ${isMultiOpen ? 'pl-6' : ''}`}>
           <tool.Icon className={`h-8 w-8 text-primary transition-colors duration-300 ${status !== 'error' ? 'group-hover:text-primary' : ''}`} />
         </div>
         <div className="w-full min-w-0">
           <div className="flex justify-between items-start mb-1">
-             <h3 className={`text-lg font-bold text-light-text-primary dark:text-dark-text-primary transition-colors duration-300 truncate pr-2 ${status !== 'error' ? 'group-hover:text-primary' : ''}`}>{tool.title}</h3>
+             <h3 className={`text-base sm:text-lg font-bold text-light-text-primary dark:text-dark-text-primary transition-colors duration-300 truncate pr-2 ${status !== 'error' ? 'group-hover:text-primary' : ''}`}>{tool.title}</h3>
              <button
                 onClick={handleFavoriteClick}
-                className={`flex-shrink-0 text-gray-400 dark:text-gray-500 transition-colors duration-200 rounded-full p-1 -mt-1 -mr-2 z-10 ${isFavorite ? 'text-yellow-400' : 'hover:text-yellow-400'}`}
+                className={`flex-shrink-0 text-gray-400 dark:text-gray-500 transition-colors duration-200 rounded-full -m-2 p-2 z-10 ${isFavorite ? 'text-yellow-400' : 'hover:text-yellow-400'}`}
                 aria-label={isFavorite ? `Remove ${tool.title} from favorites` : `Add ${tool.title} to favorites`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
